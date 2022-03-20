@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
   Slider,
@@ -8,7 +9,7 @@ import {
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-import { Player, Point, RootState, SingleRound } from "../../redux/reducers";
+import { Player, Point, RootState } from "../../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { getNameInitials } from "../../utils/helpers";
 import { addSingleRound } from "../../redux/actions";
