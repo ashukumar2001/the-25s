@@ -11,7 +11,7 @@ declare global {
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["Game"],
+  whitelist: ["Game"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

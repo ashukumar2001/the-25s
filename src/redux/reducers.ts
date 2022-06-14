@@ -3,7 +3,7 @@ import { ADD_SINGLE_ROUND, EDIT_SINGLE_ROUND, START_GAME } from "./actions";
 
 export interface Player {
   playerName: string;
-  playerId: string | undefined;
+  playerId: string;
 }
 
 export interface Point {
