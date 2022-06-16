@@ -8,10 +8,12 @@ declare global {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
   }
 }
+
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["Game"],
+  version: 1,
+  whitelist: ["Game"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

@@ -9,10 +9,11 @@ import {
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-import { Player, Point, RootState } from "../../redux/reducers";
+import { Player, Point, RootState, SingleRound } from "../../redux/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { getNameInitials } from "../../utils/helpers";
 import { addSingleRound } from "../../redux/actions";
+import { roundCheck } from "../../utils/custom.hooks";
 const drawerBleeding = 30;
 
 const StyledBox = styled(Box)`
@@ -145,6 +146,9 @@ const BottomDrawer = () => {
   const container =
     window !== undefined ? () => window.document.body : undefined;
   const toggleDrawer = (value: boolean) => setIsOpenDrawer(value);
+  const rounds: Array<SingleRound> = useSelector(
+    (state: RootState) => state.Game?.currentGame?.rounds
+  );
   const players: Array<Player> = useSelector(
     (state: RootState) => state.Game?.currentGame?.players
   );
@@ -156,6 +160,18 @@ const BottomDrawer = () => {
     point: 0,
     isSumOfFour: false,
   });
+  useEffect(() => {
+    if (players && players.length === 3) {
+      const initialStateForPoints: Array<Point> = [...players].map(
+        (item: Player): Point => ({
+          playerId: item?.playerId,
+          point: 0,
+          isSumOfFour: false,
+        })
+      );
+      setPoints([...initialStateForPoints]);
+    }
+  }, [players, rounds]);
   const handleSliderValueChange = (
     value: number | Array<number>,
     playerId: string | undefined
@@ -176,10 +192,21 @@ const BottomDrawer = () => {
         (element) => element.playerId === point?.playerId
       );
 
+      const isPointsContainsTwoZero =
+        [..._points].filter((item) => item.point === 0)?.length === 2;
+
       if (foundIndex === -1) {
         _points.push(point || {});
       } else {
-        _points[foundIndex] = point;
+        _points[foundIndex] = {
+          ...point,
+          isSumOfFour:
+            point.point > 5
+              ? true
+              : isPointsContainsTwoZero && point.point === 5
+              ? true
+              : point?.point >= 5,
+        };
       }
       setPoints([..._points]);
     }
@@ -261,19 +288,20 @@ const BottomDrawer = () => {
           >
             <Button
               variant="outlined"
-              color="inherit"
+              // color="inherit"
               onClick={() => toggleDrawer(false)}
             >
               Clear
             </Button>
             <Button
               variant="contained"
-              color="inherit"
               onClick={() => {
                 dispatch(addSingleRound(points));
                 toggleDrawer(false);
                 setPoints([]);
               }}
+              title="save data"
+              disabled={!roundCheck(points)}
             >
               Save
             </Button>
