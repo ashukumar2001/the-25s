@@ -1,5 +1,11 @@
 import { Action, combineReducers } from "redux";
-import { ADD_SINGLE_ROUND, EDIT_SINGLE_ROUND, START_GAME } from "./actions";
+import {
+  ADD_SINGLE_ROUND,
+  EDIT_SINGLE_ROUND,
+  SET_GAME_HISTORY,
+  SET_GAME_WON,
+  START_GAME,
+} from "./actions";
 
 export interface Player {
   playerName: string;
@@ -20,17 +26,24 @@ export interface SingleRound {
 export interface Game {
   players: Array<Player>;
   rounds: Array<SingleRound>;
-  time: Date;
+  time: null | Date;
   isCompleted: boolean;
+  playerWon: null | Player;
 }
 
 interface GameState {
-  currentGame?: Game;
+  currentGame: Game;
   history: Array<Game>;
 }
 
 const initialState: GameState = {
-  // currentGame: { players: [], rounds: [], time: new Date(), isCompleted: false },
+  currentGame: {
+    players: [],
+    rounds: [],
+    time: null,
+    isCompleted: false,
+    playerWon: null,
+  },
   history: [],
 };
 
@@ -39,10 +52,13 @@ interface ReduxAction extends Action {
   payload?: any;
 }
 
-const GameReducer = (state = initialState, { type, payload }: ReduxAction) => {
+const GameReducer = (
+  state = { ...initialState },
+  { type, payload }: ReduxAction
+) => {
   switch (type) {
     case START_GAME:
-      return { ...state, currentGame: payload };
+      return { ...state, currentGame: { ...state.currentGame, ...payload } };
     case ADD_SINGLE_ROUND:
       return {
         ...state,
@@ -67,10 +83,28 @@ const GameReducer = (state = initialState, { type, payload }: ReduxAction) => {
           rounds: [..._rounds],
         },
       };
+    case SET_GAME_WON:
+      return {
+        ...state,
+        currentGame: {
+          ...state?.currentGame,
+          ...payload,
+        },
+      };
+    case SET_GAME_HISTORY:
+      return {
+        ...state,
+        currentGame: {
+          ...initialState.currentGame,
+        },
+        history: [...state.history, state?.currentGame],
+      };
     default:
       return state;
   }
 };
-const rootReducer = combineReducers({ Game: GameReducer });
+const rootReducer = combineReducers({
+  Game: GameReducer,
+});
 export default rootReducer;
 export type RootState = ReturnType<typeof rootReducer>;

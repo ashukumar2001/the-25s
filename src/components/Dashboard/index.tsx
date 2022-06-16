@@ -14,9 +14,12 @@ import {
 } from "@mui/material";
 import styled from "@emotion/styled";
 import BottomDrawer from "./Drawer";
-import { useSelector } from "react-redux";
-import { RootState, SingleRound } from "../../redux/reducers";
+import { useDispatch, useSelector } from "react-redux";
+import { Game, Player, RootState, SingleRound } from "../../redux/reducers";
 import { useEffect, useState } from "react";
+import winnerTrophyIcon from "../../assets/icons/winner-trophy.png";
+import { useNavigate } from "react-router-dom";
+import { setGameHistory, setGameWon } from "../../redux/actions";
 
 const PointsText = styled(Typography)`
   height: 36px;
@@ -52,41 +55,61 @@ const PointsChangedText = styled(Typography)(
 );
 
 const Dashboard = () => {
-  const [isGameCompleted, setIsGameCompleted] = useState<boolean>(false);
-  const rounds: Array<SingleRound> = useSelector(
-    (state: RootState) => state.Game?.currentGame?.rounds
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { players, playerWon, isCompleted, rounds } = useSelector(
+    (state: RootState): Game => state.Game.currentGame
   );
+
   const totalRoundsWithPoints = [...rounds].map((item) => item.points);
 
   useEffect(() => {
-    const allValues = [...totalRoundsWithPoints].reduce((prev, curr) => {
-      return curr.map((item, index) => {
-        return { ...item, point: item.point + prev[index].point };
-      });
-    });
-    const playerWin = allValues.find((item) => item.point >= 25);
-    if (playerWin && Object.keys(playerWin).length > 0) {
-      setIsGameCompleted(true);
+    if (players && players.length !== 3) {
+      navigate("/players-registration", { replace: true });
     }
-  }, [totalRoundsWithPoints]);
+  }, [players]);
+
+  useEffect(() => {
+    const allValues =
+      totalRoundsWithPoints.length > 0
+        ? [...totalRoundsWithPoints].reduce((prev, curr) => {
+            return curr.map((item, index) => {
+              return { ...item, point: item.point + prev[index].point };
+            });
+          })
+        : [];
+    const playerWon = allValues.find((item) => item.point >= 25);
+    if (playerWon && Object.keys(playerWon).length > 0) {
+      const playerProfile = players.find(
+        (p) => p.playerId === playerWon.playerId
+      );
+      dispatch(
+        setGameWon({
+          playerWon: { ...playerWon, ...(playerProfile || {}) },
+          isCompleted: true,
+        })
+      );
+    }
+  }, [rounds]);
+
   return (
     <>
       <Dialog
-        open={isGameCompleted}
+        open={isCompleted}
         // onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Someone won the game</DialogTitle>
-        {/* <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending anonymous
-            location data to Google, even when no apps are running.
-          </DialogContentText>
-        </DialogContent> */}
+        <Stack direction="column" alignItems="center" justifyContent="center">
+          <img src={winnerTrophyIcon} alt="winner-torphy-icon" />
+          <DialogTitle id="alert-dialog-title">
+            {playerWon?.playerName} has won the game
+          </DialogTitle>
+        </Stack>
+
         <DialogActions>
           {/* <Button onClick={handleClose}>Disagree</Button> */}
-          <Button onClick={() => {}} autoFocus>
+          <Button onClick={() => dispatch(setGameHistory())} autoFocus>
             Agree
           </Button>
         </DialogActions>
@@ -124,12 +147,14 @@ const Dashboard = () => {
                             ...currentRoundsWithPoints,
                           ].map((item) => item[pointIndex]);
                           const sumOfAllPoints =
-                            allPointsWithCurrentIndex.reduce(
-                              (prev, current) => {
-                                return prev + current.point;
-                              },
-                              0
-                            );
+                            allPointsWithCurrentIndex?.length > 0
+                              ? allPointsWithCurrentIndex.reduce(
+                                  (prev, current) => {
+                                    return prev + current.point;
+                                  },
+                                  0
+                                )
+                              : [];
                           return (
                             <PointsText
                               key={`round-${index}-point-${pointIndex}`}
