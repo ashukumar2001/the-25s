@@ -22,13 +22,14 @@ export interface SingleRound {
   points: Array<Point>;
   id: string;
 }
+export interface PlayerWon extends Point, Player {}
 
 export interface Game {
   players: Array<Player>;
   rounds: Array<SingleRound>;
-  time: null | Date;
+  time: string | number | Date | null;
   isCompleted: boolean;
-  playerWon: null | Player;
+  playerWon: null | PlayerWon;
 }
 
 interface GameState {

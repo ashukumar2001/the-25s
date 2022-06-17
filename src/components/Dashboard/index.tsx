@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import winnerTrophyIcon from "../../assets/icons/winner-trophy.png";
 import { useNavigate } from "react-router-dom";
 import { setGameHistory, setGameWon } from "../../redux/actions";
+import DataRow from "../Custom/DataRow";
 
 const PointsText = styled(Typography)`
   height: 36px;
@@ -33,15 +34,6 @@ const PointsText = styled(Typography)`
     font-size: 1.2rem;
     line-height: 10px;
   }
-`;
-
-const DataRow = styled(Paper)`
-  display: inline-block;
-  width: calc(100% - 16px);
-  border-radius: 0.5rem;
-  padding: 0.15rem 0.5rem;
-  margin: 0.25rem auto;
-  background: rgba(0, 0, 0, 0.76);
 `;
 
 type CustomPointsChangeTextProps = TypographyProps & {
@@ -65,7 +57,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (players && players.length !== 3) {
-      navigate("/players-registration", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [players]);
 
@@ -110,7 +102,7 @@ const Dashboard = () => {
         <DialogActions>
           {/* <Button onClick={handleClose}>Disagree</Button> */}
           <Button onClick={() => dispatch(setGameHistory())} autoFocus>
-            Agree
+            Back to home
           </Button>
         </DialogActions>
       </Dialog>
