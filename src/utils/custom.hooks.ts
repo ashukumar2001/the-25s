@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Point } from "../redux/reducers";
 
 const roundCheck = (p: Array<Point>) => {

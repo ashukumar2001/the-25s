@@ -1,17 +1,16 @@
 import { Add } from "@mui/icons-material";
 import {
   Button,
-  Container,
-  IconButton,
+  Grid,
   List,
   ListItem,
   ListItemButton,
-  SpeedDialIcon,
   Typography,
 } from "@mui/material";
+import moment from "moment";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Game, PlayerWon, RootState } from "../../redux/reducers";
+import { Game, RootState } from "../../redux/reducers";
 import DataRow from "../Custom/DataRow";
 
 const Home = () => {
@@ -36,7 +35,6 @@ const Home = () => {
           gameHistory.length > 0 &&
           [...gameHistory].map((item: Game, index: number) => {
             const { playerWon, time } = item;
-            const gameDate = (time && new Date(time)) || new Date();
 
             return (
               <ListItem
@@ -53,8 +51,30 @@ const Home = () => {
                       padding: ".75rem .5rem !important",
                     }}
                   >
-                    {playerWon?.playerName} &nbsp; {playerWon?.point} &nbsp;
-                    {`${gameDate.getDate()}`}
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={6}>
+                        <Typography variant="subtitle1">
+                          {playerWon?.playerName}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography variant="subtitle1">
+                          {playerWon?.point}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={3}>
+                        <Typography
+                          variant="caption"
+                          align="right"
+                          sx={{
+                            color: (theme) => theme.palette.grey[400],
+                            marginLeft: "auto",
+                          }}
+                        >
+                          {moment(time).format("DD MMM YY")}
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </DataRow>
                 </ListItemButton>
               </ListItem>

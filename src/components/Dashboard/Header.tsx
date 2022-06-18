@@ -8,7 +8,7 @@ import { getNameInitials } from "../../utils/helpers";
 const HeaderContainer = styled(Paper)`
   display: inline-block;
   width: calc(100% - 16px);
-  margin: 1rem auto;
+  margin: 0 auto 1rem;
   border-radius: 2rem;
   padding: 0.5rem 0.5rem;
   background: linear-gradient(

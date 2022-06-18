@@ -2,6 +2,7 @@ import { Action, combineReducers } from "redux";
 import {
   ADD_SINGLE_ROUND,
   EDIT_SINGLE_ROUND,
+  QUIT_GAME,
   SET_GAME_HISTORY,
   SET_GAME_WON,
   START_GAME,
@@ -99,6 +100,13 @@ const GameReducer = (
           ...initialState.currentGame,
         },
         history: [...state.history, state?.currentGame],
+      };
+    case QUIT_GAME:
+      return {
+        ...state,
+        currentGame: {
+          ...initialState.currentGame,
+        },
       };
     default:
       return state;

@@ -1,13 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Header from "./Header";
 import {
   Button,
+  Container,
   Dialog,
   DialogActions,
   DialogTitle,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
-  Paper,
   Stack,
   Typography,
   TypographyProps,
@@ -15,12 +17,13 @@ import {
 import styled from "@emotion/styled";
 import BottomDrawer from "./Drawer";
 import { useDispatch, useSelector } from "react-redux";
-import { Game, Player, RootState, SingleRound } from "../../redux/reducers";
+import { Game, RootState } from "../../redux/reducers";
 import { useEffect, useState } from "react";
 import winnerTrophyIcon from "../../assets/icons/winner-trophy.png";
 import { useNavigate } from "react-router-dom";
-import { setGameHistory, setGameWon } from "../../redux/actions";
+import { quitGame, setGameHistory, setGameWon } from "../../redux/actions";
 import DataRow from "../Custom/DataRow";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 
 const PointsText = styled(Typography)`
   height: 36px;
@@ -49,6 +52,7 @@ const PointsChangedText = styled(Typography)(
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isShowGameQuitDialog, setIsShowGameQuitDialog] = useState(false);
   const { players, playerWon, isCompleted, rounds } = useSelector(
     (state: RootState): Game => state.Game.currentGame
   );
@@ -86,28 +90,46 @@ const Dashboard = () => {
 
   return (
     <>
-      <Dialog
-        open={isCompleted}
-        // onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={isCompleted} aria-labelledby="winner-label">
         <Stack direction="column" alignItems="center" justifyContent="center">
           <img src={winnerTrophyIcon} alt="winner-torphy-icon" />
-          <DialogTitle id="alert-dialog-title">
+          <DialogTitle id="winner-label">
             {playerWon?.playerName} has won the game
           </DialogTitle>
         </Stack>
 
         <DialogActions>
-          {/* <Button onClick={handleClose}>Disagree</Button> */}
           <Button onClick={() => dispatch(setGameHistory())} autoFocus>
-            Back to home
+            Okay!
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog open={isShowGameQuitDialog} aria-labelledby="quit-game-label">
+        <DialogTitle id="quit-game-label">
+          Are you sure you want to quit this game?
+        </DialogTitle>
+
+        <DialogActions>
+          <Button onClick={() => setIsShowGameQuitDialog(false)} autoFocus>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setIsShowGameQuitDialog(false);
+              dispatch(quitGame());
+            }}
+          >
+            Quit
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Container sx={{ padding: ".75rem 0" }} disableGutters>
+        <IconButton onClick={() => setIsShowGameQuitDialog(true)}>
+          <ArrowBackIosRoundedIcon sx={{ fontSize: "1.25rem" }} />
+        </IconButton>
+      </Container>
       <Header />
-      <List sx={{ maxHeight: "75vh", overflowY: "auto" }}>
+      <List sx={{ maxHeight: "75vh", overflowY: "auto", paddingTop: "0" }}>
         {rounds &&
           rounds.length > 0 &&
           rounds.map((value, index) => {
