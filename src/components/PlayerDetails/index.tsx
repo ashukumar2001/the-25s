@@ -58,9 +58,6 @@ const PlayersDetailsStepper = () => {
     );
     navigate("/dashboard");
   };
-  useEffect(() => {
-    console.log({ players });
-  }, [players]);
   return (
     <Stack
       direction="row"
